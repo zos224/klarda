@@ -1,0 +1,324 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Topic {
+  id Int @id @default(autoincrement())
+  name String @unique
+  topicPPs TopicPP[]
+  topicUCs TopicUC[]
+}
+
+model ParticipantProject {
+  id Int @id @default(autoincrement())
+  idUser Int?
+  user User? @relation(fields: [idUser], references: [id])
+  title String?
+  firstName String?
+  lastName String?
+  email String?
+  phone String?
+  company String?
+  street String?
+  zipCode String?
+  city String?
+  country String?
+  description String?
+  abstract String?
+  status Boolean
+  code String?
+  acronym String?
+  website String?
+  contact String?
+  dfgclassification String?
+  material String?
+  engagement String?
+  topicPPs TopicPP[]
+  image String?
+  slug String
+}
+
+model TopicPP {
+  id Int @id @default(autoincrement())
+  idTopic Int 
+  topic Topic @relation(fields: [idTopic], references: [id], onDelete: Cascade)
+  idPP Int
+  pp ParticipantProject @relation(fields: [idPP], references: [id], onDelete: Cascade)
+}
+
+model UseCase {
+  id Int @id @default(autoincrement())
+  code String @unique
+  title String
+  description String
+  mainReq String
+  mainRelated String
+  otherRelated String
+  possibleConn String
+  material String
+  mainSuccess String
+  addedValue String
+  topicUCs TopicUC[]
+  slug String
+}
+
+model TopicUC {
+  id Int @id @default(autoincrement())
+  idTopic Int 
+  topic Topic @relation(fields: [idTopic], references: [id], onDelete: Cascade)
+  idUC Int
+  uc UseCase @relation(fields: [idUC], references: [id], onDelete: Cascade)
+}
+
+model Teaching {
+  id Int @id @default(autoincrement())
+  name String
+  thumb String
+  description String
+  link String
+}
+
+model Contact {
+  id Int @id @default(autoincrement())
+  gender String
+  title String
+  firstName String
+  lastName String
+  email String
+  researchArea String
+  messages String
+  status Boolean
+}
+
+model ToolType {
+  id Int @id @default(autoincrement())
+  name String @unique
+  tools Tool[]
+}
+
+model Tool {
+  id Int @id @default(autoincrement())
+  idToolType Int
+  toolType ToolType @relation(fields: [idToolType], references: [id], onDelete: Cascade)
+  name String
+  description String
+  affilations String
+  tags String
+  link String
+}
+
+model Link {
+  id Int @id @default(autoincrement())
+  name String
+  link String
+  @@unique([name, link])
+}
+
+model openPosition {
+  id Int @id @default(autoincrement())
+  company String
+  jobDes String
+  category String
+  onlineSince DateTime
+  contact String
+}
+
+model BlogCategory {
+  id Int @id @default(autoincrement())
+  name String @unique
+  blogBlogCategorys Blog_BlogCategory[]
+}
+
+model Blog {
+  id Int @id @default(autoincrement())
+  title String
+  content String
+  date DateTime
+  thumb String
+  slug String
+  blogBlogCategorys Blog_BlogCategory[]
+}
+
+model Blog_BlogCategory {
+  id Int @id @default(autoincrement())
+  idBlogCategory Int
+  blogCategory BlogCategory @relation(fields: [idBlogCategory], references: [id], onDelete: Cascade)
+  idBlog Int
+  blog Blog @relation(fields: [idBlog], references: [id], onDelete: Cascade)
+}
+
+model Event {
+  id Int @id @default(autoincrement())
+  title String
+  slug String @default("hello")
+  location String
+  language String
+  idEventType Int
+  eventType EventType? @relation(fields: [idEventType], references: [id], onDelete: Restrict)
+  overview String
+  goals String
+  matter String
+  startDateTime DateTime
+  endDateTime DateTime
+  status Boolean
+  idUser Int?
+  user User? @relation(fields: [idUser], references: [id], onDelete: Restrict)
+  link String?
+  platform String
+  ageLimit Int @default(18)
+  max Int @default(99999)
+  eEventTopics Event_EventTopic[]
+  eventPersons EventPerson[]
+  programs Program[]
+  userEvents UserEvent[]
+}
+
+model EventType {
+  id Int @id @default(autoincrement())
+  name String @unique
+  icon String
+  events Event[]
+  eventTopics EventTopic[]
+}
+
+model EventTopic {
+  id Int @id @default(autoincrement())
+  idEventType Int
+  eventType EventType? @relation(fields: [idEventType], references: [id], onDelete: Cascade)
+  name String
+  eEventTopics Event_EventTopic[]
+}
+
+model Event_EventTopic {
+  id Int @id @default(autoincrement())
+  idEvent Int
+  event Event @relation(fields: [idEvent], references: [id], onDelete: Cascade)
+  idEventTopic Int
+  eventTopic EventTopic @relation(fields: [idEventTopic], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  gender String
+  academicTitle String
+  name String
+  organization String
+  department String
+  type String
+  password String
+  avatar String?
+  aboutMe String?
+  birthday String?
+  role String @default("user")
+  events Event[]
+  pps ParticipantProject[]
+  userEvents UserEvent[]
+}
+
+model EventPerson {
+  id Int @id @default(autoincrement())
+  idEvent Int
+  event Event @relation(fields: [idEvent], references: [id], onDelete: Cascade)
+  avatar String
+  academicTitle String
+  name String
+  company String
+  role String
+}
+
+model Program {
+  id Int @id @default(autoincrement())
+  idEvent Int
+  event Event @relation(fields: [idEvent], references: [id], onDelete: Cascade)
+  idIcon Int
+  icon Icon @relation(fields: [idIcon], references: [id], onDelete: Restrict)
+  date DateTime
+  time String
+  duration Int
+  activity String
+  location String
+  mainContent String
+  description String
+}
+
+model Icon {
+  id Int @id @default(autoincrement())
+  name String
+  icon String
+  programs Program[]
+}
+
+model UserEvent {
+  id Int @id @default(autoincrement())
+  idUser Int
+  user User @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  idEvent Int
+  event Event @relation(fields: [idEvent], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id Int @id @default(autoincrement())
+  logo String
+  favicon String
+  title String
+  description String
+  term String @default("")
+  privacy String @default("")
+  phone String @default("")
+  email String @default("")
+  view Int 
+}
+
+model SettingSEO {
+  id Int @id @default(autoincrement())
+  about Json @default(dbgenerated("'{}'"))
+  aims Json @default(dbgenerated("'{}'"))
+  consortium Json @default(dbgenerated("'{}'"))
+  taskArea Json @default(dbgenerated("'{}'"))
+  coop Json @default(dbgenerated("'{}'"))
+  pp Json @default(dbgenerated("'{}'"))
+  uc Json @default(dbgenerated("'{}'"))
+  tool Json @default(dbgenerated("'{}'"))
+  event Json @default(dbgenerated("'{}'"))
+  teaching Json @default(dbgenerated("'{}'"))
+  link Json @default(dbgenerated("'{}'"))
+  blog Json @default(dbgenerated("'{}'"))
+  contact Json @default(dbgenerated("'{}'"))
+  openPosition Json @default(dbgenerated("'{}'"))
+  newPP Json @default(dbgenerated("'{}'"))
+}
+
+model Content {
+  id Int @id @default(autoincrement())
+  home Json @default(dbgenerated("'{}'"))
+  about String @default("")
+  aims Json @default(dbgenerated("'{}'"))
+  consortium Json @default(dbgenerated("'{}'"))
+  taskArea Json @default(dbgenerated("'{}'"))
+  newPP String @default("")
+  contact String @default("")
+  coop Json @default(dbgenerated("'{}'"))
+}
+
+model EmailSend {
+  id Int @id @default(autoincrement())
+  listEmail Json @default(dbgenerated("'{}'"))
+}
+
+model Email {
+  id Int @id @default(autoincrement())
+  title String
+  content String
+}
